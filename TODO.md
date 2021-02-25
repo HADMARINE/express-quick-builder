@@ -1,1 +1,2 @@
-- [ ] write todo here
+- [ ] README
+- [ ] CI/CD
