@@ -1,0 +1,10 @@
+src
+node_modules
+.eslintrc.js
+.npmignore
+.prettierignore
+SECURITY.md
+tsconfig.json
+tslint.json
+yarn.lock
+TODO.md
