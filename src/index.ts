@@ -7,7 +7,7 @@ import {
 } from "./util/ControllerUtil";
 import { serverStarter } from "./util/ServerStarter";
 import RestDecorator from "./util/RestDecorator";
-import errorBuilder from "@util/ErrorBuilder";
+import errorBuilder from "./util/ErrorBuilder";
 
 // TYPES
 export type WrappedRequest = _WrappedRequest;

@@ -1,10 +1,5 @@
 import { RequestHandler, Router } from "express";
-import {
-  WrappedRequest,
-  ResponseOptions,
-  Wrapper,
-  RawWrapper,
-} from "@util/ControllerUtil";
+import { WrappedRequest, ResponseOptions, Wrapper } from "./ControllerUtil";
 import ErrorDictionary from "./ErrorDictionary";
 
 export type EndpointProcessProperties = Partial<{

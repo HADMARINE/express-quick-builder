@@ -1,5 +1,4 @@
-import ErrorDictionary from "@error/ErrorDictionary";
-import Assets from "@util/Assets";
+import ErrorDictionary from "./ErrorDictionary";
 import logger from "clear-logger";
 
 type nully = null;
@@ -119,7 +118,7 @@ function ArrayParser<T>(data: any, key: string): T[] {
   if (isArray(data)) return data as T[];
   if (isString(data)) {
     logger.debug("String parsed to array, DO NOT USE THIS IN PRODUCTION!");
-    return Assets.returnArray(data);
+    return returnArray(data);
   }
   throw ErrorDictionary.data.parameterInvalid(key);
 }
@@ -155,7 +154,7 @@ function verifier<T>(
     case isObject:
     case isObjectNullable:
       if (isObject(data)) return (data as unknown) as T;
-      const record = Assets.returnRecord(data);
+      const record = returnRecord(data);
       if (isObject(record)) return (record as unknown) as T;
       throw ErrorDictionary.data.parameterInvalid(key);
     case isBoolean as unknown:
@@ -257,4 +256,26 @@ export function verificationWrapper(data: Record<string, any>) {
     }
     return returnData;
   };
+}
+
+function returnRecord(data: any): Record<any, any> | null {
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+  return data;
+}
+
+function returnArray<T>(data: any): T[] {
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      data = JSON.parse(`[${data}]`);
+    }
+  }
+  return data;
 }
