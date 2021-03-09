@@ -31,8 +31,7 @@ function detectRouterTypeAndReturn(file: string): NodeRequire {
 
 function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
   const routesPath: string = path.resolve(
-    __dirname,
-    "../../",
+    process.cwd(),
     rootDir,
     `.${routePath}`
   );
@@ -43,7 +42,9 @@ function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
     const file: any = path.join(routesPath, f);
     const stat: fs.Stats = fs.statSync(file);
     if (stat.isDirectory()) {
-      datas.push(...getPathRoutes(`${routePath.replace(/\/$/, "")}/${f}`));
+      datas.push(
+        ...getPathRoutes(rootDir, `${routePath.replace(/\/$/, "")}/${f}`)
+      );
       continue;
     }
     if (!file.match(/\.(controller|routes)\.(js|ts)$/)) {
@@ -73,7 +74,7 @@ function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
   return datas;
 }
 
-function getRoutes(routePath = "./src/routes"): GetRoutes {
+function getRoutes(routePath = `${process.cwd()}/routes`): GetRoutes {
   const res = getPathRoutes(routePath);
 
   if (invalidlyRoutedList.length > 0) {
