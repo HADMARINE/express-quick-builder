@@ -14,11 +14,16 @@ export function serverStarter(params: {
   routePath?: string;
   customErrorHandler?: RequestHandler;
   customNotFoundHandler?: RequestHandler;
+  appName?: string;
 }) {
+  logger.debug("[EQB] EXPRESS-QUICK-BUILDER Server Starter is running");
+
   const app = params.app ? params.app : express();
   const server = http.createServer(app);
   const listenPort = listen(params.port || 610000, server, {
     portStrict: params.portStrict,
+    appName:
+      params.appName || "EXPRESS API SERVER powered by express-quick-builder",
   });
 
   let executeResult: any[] | undefined = undefined;
@@ -58,14 +63,14 @@ export function serverStarter(params: {
 function listen(
   port: number,
   server: http.Server,
-  settings: Partial<{ portStrict: boolean }>
+  settings: Partial<{ portStrict: boolean; appName: string }>
 ): number {
   if (port <= 0 || port >= 65536) {
-    logger.error(`PORT Range is Invalid. Recieved port : ${port}`);
+    logger.warn(`[EQB] PORT Range is Invalid. Recieved port : ${port}`);
 
     if (settings.portStrict === true) {
       logger.error(
-        " Set PORT_STRICT to false on your .env if you want to execute anyway."
+        "[EQB] Set portStrict to false on your ServerStarter if you want to execute anyway."
       );
       throw new Error("PORT STRICT ERROR");
     }
@@ -76,16 +81,16 @@ function listen(
 
   let isError = false;
   server.once("error", (err: any) => {
-    if (process.env.PORT_STRICT === "true") {
-      logger.error(` Port ${port} is already in use.`);
+    if (settings.portStrict === true) {
+      logger.error(`[EQB] Port ${port} is already in use.`);
       logger.info(
-        "Set PORT_STRICT to false on your .env if you want to execute anyway."
+        "Set portStrict to false on your ServerStarter if you want to execute anyway."
       );
       throw new Error("PORT STRICT");
     }
     if (err.code === "EADDRINUSE") {
       logger.info(
-        `Port ${port} is currently in use. Retrying with port ${port + 1}`
+        `[EQB] Port ${port} is currently in use. Retrying with port ${port + 1}`
       );
       const newPort = port > 65535 ? 20000 : port + 1;
       listen(newPort, server, settings);
@@ -95,7 +100,7 @@ function listen(
   server.once("listening", () => {
     if (!isError) {
       logger.success(
-        chalk.black.bgGreen(` App started on port `) +
+        chalk.black.bgGreen(`[EQB] ${settings.appName} started on port `) +
           chalk.green.bold(` ${port}`)
       );
     }

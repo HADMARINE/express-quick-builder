@@ -38,4 +38,12 @@ export const QuickDecorator = RestDecorator;
 
 export const ErrorBuilder = errorBuilder;
 
-export default serverStarter;
+export const ServerStarter = serverStarter;
+
+export default {
+  serverStarter,
+  RestDecorator,
+  Wrapper,
+  RawWrapper,
+  DataTypes,
+};

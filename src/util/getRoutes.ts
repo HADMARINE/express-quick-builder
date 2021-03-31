@@ -55,7 +55,7 @@ function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
 
     if (!router) {
       logger.warn(
-        `${file} has no default export or have syntax error. Ignoring...`
+        `[EQB] ${file} has no default export or have syntax error. Ignoring...`
       );
       continue;
     }
