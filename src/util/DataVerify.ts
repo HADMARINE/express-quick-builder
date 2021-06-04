@@ -23,7 +23,7 @@ function isNotNull<T>(data: T | nully): data is T {
   return data !== undefined && data !== null;
 }
 
-function isAny(data: any): data is any {
+function isAny<T = any>(data: any): data is T {
   return true;
 }
 
@@ -107,9 +107,14 @@ export const DataTypes = {
   functionNull: isFunctionNullable,
   string: isString,
   stringNull: isStringNullable,
-  array: <T>() => (data: any): data is T[] => isArray<T>(data),
-  arrayNull: <T>() => (data: any): data is T[] | nully =>
-    isArrayNullable<T>(data),
+  array:
+    <T>() =>
+    (data: any): data is T[] =>
+      isArray<T>(data),
+  arrayNull:
+    <T>() =>
+    (data: any): data is T[] | nully =>
+      isArrayNullable<T>(data),
   boolean: isBoolean,
   booleanNull: isBooleanNullable,
 };
@@ -143,7 +148,7 @@ function verifier<T>(
         isNumberNullable,
       ].find((d) => d === dataVerifyFunction) !== undefined
     ) {
-      return (null as unknown) as T;
+      return null as unknown as T;
     }
     throw ErrorDictionary.data.parameterNull(key);
   }
@@ -153,19 +158,19 @@ function verifier<T>(
       return data;
     case isObject:
     case isObjectNullable:
-      if (isObject(data)) return (data as unknown) as T;
+      if (isObject(data)) return data as unknown as T;
       const record = returnRecord(data);
-      if (isObject(record)) return (record as unknown) as T;
+      if (isObject(record)) return record as unknown as T;
       throw ErrorDictionary.data.parameterInvalid(key);
     case isBoolean as unknown:
     case isBooleanNullable as unknown:
-      if (isBoolean(data)) return (data as unknown) as T;
+      if (isBoolean(data)) return data as unknown as T;
       if (isString(data)) {
         switch (data) {
           case "true":
-            return (true as unknown) as T;
+            return true as unknown as T;
           case "false":
-            return (false as unknown) as T;
+            return false as unknown as T;
           default:
             throw ErrorDictionary.data.parameterInvalid(key);
         }
@@ -173,18 +178,18 @@ function verifier<T>(
       throw ErrorDictionary.data.parameterInvalid(key);
     case isString as unknown:
     case isStringNullable as unknown:
-      if (isString(data)) return (data as unknown) as T;
+      if (isString(data)) return data as unknown as T;
       throw ErrorDictionary.data.parameterInvalid(key);
     case isNumber as unknown:
     case isNumberNullable as unknown:
-      if (isNumber(data)) return (data as unknown) as T;
+      if (isNumber(data)) return data as unknown as T;
       if (isNaN(data)) throw ErrorDictionary.data.parameterInvalid(key);
-      return (parseFloat(data) as unknown) as T;
+      return parseFloat(data) as unknown as T;
     case isArray as unknown:
     case isArrayNullable as unknown:
       const arr = ArrayParser(data, key);
-      if (arr.length === 0) return (null as unknown) as T;
-      return (arr as unknown) as T;
+      if (arr.length === 0) return null as unknown as T;
+      return arr as unknown as T;
     default:
       if (dataVerifyFunction(data)) {
         return data;
