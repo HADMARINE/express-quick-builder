@@ -47,6 +47,7 @@ export function serverStarter(params: {
         err.status = 404;
         err.code = "PAGE_NOT_FOUND";
         err.data = { directory: `${req.method} ${req.url}` };
+        throw err;
       })
   );
 
