@@ -20,7 +20,7 @@ export function serverStarter(params: {
 
   const app = params.app ? params.app : express();
   const server = http.createServer(app);
-  const listenPort = listen(params.port || 610000, server, {
+  const listenPort = listen(params.port || 61000, server, {
     portStrict: params.portStrict,
     appName:
       params.appName || "EXPRESS API SERVER powered by express-quick-builder",
