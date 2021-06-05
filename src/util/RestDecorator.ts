@@ -50,7 +50,7 @@ const processHandlers = (
   v.handlers.unshift(...middleware);
 
   if (!properties.useCustomHandler) {
-    const preHandler = (v.handlers[v.handlers.length - 1] as unknown) as (
+    const preHandler = v.handlers[v.handlers.length - 1] as unknown as (
       req: WrappedRequest
     ) => any;
 
@@ -77,11 +77,18 @@ const processHandlers = (
   return { handlers: v.handlers, properties: settings };
 };
 
+function stringGuard(value: any): value is string {
+  return typeof value === "string";
+}
+
 const MappingFactory = (method: METHODS) => {
   return (
     dir: string | RegExp | (string | RegExp)[] = "/",
     ...middleware: RequestHandler[]
   ): MethodDecorator => {
+    if (stringGuard(dir)) {
+      dir[0] !== "/" ? (dir = `/${dir}`) : undefined;
+    }
     return (target, propertyKey, descriptor: PropertyDescriptor): void => {
       if (!descriptor.value) return;
       const { handlers, properties } = processHandlers(

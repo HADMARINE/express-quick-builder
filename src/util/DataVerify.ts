@@ -19,6 +19,13 @@ function isNumberNullable(data: any): data is number | nully {
   return data === undefined || data === null || isNumber(data);
 }
 
+function isDate(data: any): data is Date {
+  return typeof data === "string";
+}
+function isDateNullable(data: any): data is Date | nully {
+  return typeof data === "string" || data == null;
+}
+
 function isNotNull<T>(data: T | nully): data is T {
   return data !== undefined && data !== null;
 }
@@ -66,6 +73,8 @@ export type ProcessorType = {
     | typeof isObjectNullable
     | typeof isNumber
     | typeof isNumberNullable
+    | typeof isDate
+    | typeof isDateNullable
     | typeof isNotNull
     | typeof isAny
     | typeof isFunction
@@ -84,6 +93,8 @@ export type PureProcessorType =
   | typeof isObjectNullable
   | typeof isNumber
   | typeof isNumberNullable
+  | typeof isDate
+  | typeof isDateNullable
   | typeof isNotNull
   | typeof isAny
   | typeof isFunction
@@ -107,6 +118,8 @@ export const DataTypes = {
   functionNull: isFunctionNullable,
   string: isString,
   stringNull: isStringNullable,
+  date: isDate,
+  dateNull: isDateNullable,
   array:
     <T>() =>
     (data: any): data is T[] =>

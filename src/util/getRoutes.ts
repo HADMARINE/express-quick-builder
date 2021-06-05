@@ -64,10 +64,10 @@ function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
       continue;
     }
     let filename: string = f.replace(/\.(controller|routes)\.(js|ts)$/, "");
-    filename = filename === "index" ? "" : `/${filename}`;
+    filename = filename === "index" ? "" : `${filename}`;
 
     datas.push({
-      path: `${routePath}${filename}`,
+      path: path.resolve(`${routePath}`, `${filename}`),
       router,
     });
   }
@@ -84,6 +84,7 @@ function getRoutes(routePath = `${process.cwd()}/routes`): GetRoutes {
       false
     );
     logger.debug(
+      //TODO : change this link!
       "Read Description : https://github.com/WebBoilerplates/Typescript-Node-Express-Mongodb-backend",
       false
     );

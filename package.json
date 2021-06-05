@@ -1,6 +1,6 @@
 {
   "name": "express-quick-builder",
-  "version": "1.1.2",
+  "version": "1.1.10",
   "description": "Express api quick builder & safe verifier",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "test": ""
   },
   "dependencies": {
-    "clear-logger": "^1.0.2",
+    "clear-logger": "^1.0.3",
     "express": "^4.17.1"
   },
   "devDependencies": {
