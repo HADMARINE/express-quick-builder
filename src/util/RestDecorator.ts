@@ -87,7 +87,7 @@ const MappingFactory = (method: METHODS) => {
     ...middleware: RequestHandler[]
   ): MethodDecorator => {
     if (stringGuard(dir)) {
-      dir[0] !== "/" ? (dir = `/${dir}`) : undefined;
+      dir[0] !== "/" ? (dir = `/${dir}`) : "/";
     }
     return (target, propertyKey, descriptor: PropertyDescriptor): void => {
       if (!descriptor.value) return;
