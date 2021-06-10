@@ -203,6 +203,9 @@ function verifier<T>(
       const arr = ArrayParser(data, key);
       if (arr.length === 0) return null as unknown as T;
       return arr as unknown as T;
+    case isDate as unknown:
+    case isDateNullable as unknown:
+      return new Date(data) as unknown as T;
     default:
       if (dataVerifyFunction(data)) {
         return data;
