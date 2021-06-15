@@ -159,6 +159,7 @@ function verifier<T>(
         isBooleanNullable,
         isObjectNullable,
         isNumberNullable,
+        isDateNullable,
       ].find((d) => d === dataVerifyFunction) !== undefined
     ) {
       return null as unknown as T;
@@ -191,18 +192,26 @@ function verifier<T>(
       throw ErrorDictionary.data.parameterInvalid(key);
     case isString as unknown:
     case isStringNullable as unknown:
-      if (isString(data)) return data as unknown as T;
+      if (isString(data) && data) return data as unknown as T;
       throw ErrorDictionary.data.parameterInvalid(key);
     case isNumber as unknown:
     case isNumberNullable as unknown:
       if (isNumber(data)) return data as unknown as T;
       if (isNaN(data)) throw ErrorDictionary.data.parameterInvalid(key);
       return parseFloat(data) as unknown as T;
-    case isArray as unknown:
-    case isArrayNullable as unknown:
+    case isArrayNullable as unknown: {
+      try {
+        const arr = ArrayParser(data, key);
+        return arr as unknown as T;
+      } catch {
+        return [] as unknown as T;
+      }
+    }
+    case isArray as unknown: {
       const arr = ArrayParser(data, key);
-      if (arr.length === 0) return null as unknown as T;
+      if (arr.length === 0) throw ErrorDictionary.data.parameterInvalid(key);
       return arr as unknown as T;
+    }
     case isDate as unknown:
     case isDateNullable as unknown:
       return new Date(data) as unknown as T;

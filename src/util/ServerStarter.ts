@@ -17,16 +17,22 @@ export function serverStarter(params: {
   customErrorHandler?: RequestHandler;
   customNotFoundHandler?: RequestHandler;
   appName?: string;
-}) {
+}): {
+  port: number;
+  server: http.Server;
+  executeResult: any[] | undefined;
+  app: ReturnType<typeof express>;
+} {
   logger.debug("EXPRESS-QUICK-BUILDER Server Starter is running", false);
 
   const app = params.app ? params.app : express();
   const server = http.createServer(app);
-  const listenPort = listen(params.port || 61000, server, {
+  const listenRes = listen(params.port || 61000, server, {
     portStrict: params.portStrict,
     appName:
       params.appName || "EXPRESS API SERVER powered by express-quick-builder",
   });
+  const listenPort = listenRes;
 
   let executeResult: any[] | undefined = undefined;
 
@@ -57,7 +63,7 @@ export function serverStarter(params: {
 
   return {
     port: listenPort,
-    server,
+    server: server as http.Server,
     executeResult,
     app,
   };
@@ -96,7 +102,7 @@ function listen(
         `Port ${port} is currently in use. Retrying with port ${port + 1}`
       );
       const newPort = port > 65535 ? 20000 : port + 1;
-      listen(newPort, server, settings);
+      port = listen(newPort, server, settings);
       isError = true;
     }
   });
