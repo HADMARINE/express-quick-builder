@@ -23,7 +23,7 @@ function errorBuilder(
 
   error.data = options.data || {};
 
-  if (options.log || process.env.NODE_ENV === "development") {
+  if (options.log) {
     logger.debug(error, true);
   }
 

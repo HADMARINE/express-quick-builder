@@ -1219,10 +1219,10 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-clear-logger@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/clear-logger/-/clear-logger-1.0.3.tgz#e74566e9eafef1106d4c662c515f5cf7a0b56b8e"
-  integrity sha512-hFd3lDCv0RTpDkpBw/WamcXcHo+A94vVqhWqUtrtg0wqHvZQ9F9g3owGL4dqDHz/Pca1h7tGDhiBsZMoy2L6lQ==
+clear-logger@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/clear-logger/-/clear-logger-1.0.5.tgz#49480456fe477368b87017d3ab98cea1257a9db5"
+  integrity sha512-Vb7FRX7/E0K+CxcQQFUL7GGxyU3arIvceUoGoR8E0MFXy9/7pL+l+tTvvCvRU7uRlAIEOjQE7KcucTAxk2Sgdw==
   dependencies:
     chalk "^4.1.0"
     moment "^2.29.1"

@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { Router } from "express";
-import logger from "clear-logger";
+import _logger from "clear-logger";
+
+const logger = _logger.customName("EQB");
 
 interface GetRoutesProps {
   path: string;
@@ -55,7 +57,7 @@ function getPathRoutes(rootDir: string, routePath = "/"): GetRoutes {
 
     if (!router) {
       logger.warn(
-        `[EQB] ${file} has no default export or have syntax error. Ignoring...`
+        `${file} has no default export or have syntax error. Ignoring...`
       );
       continue;
     }
