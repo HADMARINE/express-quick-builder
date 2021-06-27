@@ -4,15 +4,15 @@ import chalk from "chalk";
 import express, { Express, RequestHandler } from "express";
 import getRoutes from "./getRoutes";
 import ErrorHandler from "./ErrorHandler";
+const pkg = require("../../package.json");
 
 const logger = _logger.customName("EQB");
 
-export function serverStarter(params: {
+export default function serverStarter(params: {
   port?: number;
   portStrict?: boolean;
   app?: Express;
   requestHandlers?: RequestHandler[];
-  executes?: (() => any | Promise<() => any>)[];
   routePath?: string;
   customErrorHandler?: RequestHandler;
   customNotFoundHandler?: RequestHandler;
@@ -20,27 +20,12 @@ export function serverStarter(params: {
 }): {
   port: number;
   server: http.Server;
-  executeResult: any[] | undefined;
   app: ReturnType<typeof express>;
 } {
-  logger.debug("EXPRESS-QUICK-BUILDER Server Starter is running", false);
+  logger.debug(`EQB ServerBuilder running (V.${pkg.version})`, false);
 
   const app = params.app ? params.app : express();
   const server = http.createServer(app);
-  const listenRes = listen(params.port || 61000, server, {
-    portStrict: params.portStrict,
-    appName:
-      params.appName || "EXPRESS API SERVER powered by express-quick-builder",
-  });
-  const listenPort = listenRes;
-
-  let executeResult: any[] | undefined = undefined;
-
-  if (params.executes) {
-    executeResult = params.executes.map(async (f) => {
-      return await f();
-    });
-  }
 
   if (params.requestHandlers) app.use(params.requestHandlers);
 
@@ -61,10 +46,15 @@ export function serverStarter(params: {
 
   app.use(params.customErrorHandler ? params.customErrorHandler : ErrorHandler);
 
+  const listenPort = listen(params.port || 61000, server, {
+    portStrict: params.portStrict,
+    appName:
+      params.appName || "EXPRESS API SERVER powered by express-quick-builder",
+  });
+
   return {
     port: listenPort,
     server: server as http.Server,
-    executeResult,
     app,
   };
 }

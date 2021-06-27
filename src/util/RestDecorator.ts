@@ -105,7 +105,7 @@ const MappingFactory = (method: METHODS) => {
   };
 };
 
-export const Mappings = {
+const Mappings = {
   get: MappingFactory(METHODS.GET),
   post: MappingFactory(METHODS.POST),
   patch: MappingFactory(METHODS.PATCH),
@@ -115,7 +115,7 @@ export const Mappings = {
   all: MappingFactory(METHODS.ALL),
 };
 
-export const SetMiddleware = (middleware: RequestHandler) => {
+const SetMiddleware = (middleware: RequestHandler) => {
   return (
     target: any,
     propName: string,
@@ -129,7 +129,7 @@ export const SetMiddleware = (middleware: RequestHandler) => {
   };
 };
 
-export const UseCustomHandler = (
+const UseCustomHandler = (
   target: any,
   propName: string,
   description: PropertyDescriptor
@@ -141,7 +141,7 @@ export const UseCustomHandler = (
   description.value = v;
 };
 
-export const SetSuccessMessage = (message: string) => {
+const SetSuccessMessage = (message: string) => {
   return (
     target: any,
     propName: string,
@@ -155,7 +155,7 @@ export const SetSuccessMessage = (message: string) => {
   };
 };
 
-export const NoErrorOnNull = (value = true) => {
+const NoErrorOnNull = (value = true) => {
   return (
     target: any,
     propName: string,
@@ -169,7 +169,7 @@ export const NoErrorOnNull = (value = true) => {
   };
 };
 
-export const SetEndpointProperties = (value: EndpointProcessProperties) => {
+const SetEndpointProperties = (value: EndpointProcessProperties) => {
   return (
     target: any,
     propName: string,
@@ -183,7 +183,7 @@ export const SetEndpointProperties = (value: EndpointProcessProperties) => {
   };
 };
 
-export const ReturnRawData = (value = true) => {
+const ReturnRawData = (value = true) => {
   return (
     target: any,
     propName: string,
@@ -197,7 +197,7 @@ export const ReturnRawData = (value = true) => {
   };
 };
 
-export const Controller = <T extends new (...args: any[]) => {}>(
+const Controller = <T extends new (...args: any[]) => {}>(
   target: T
 ): {
   new (...args: any[]): { router: Router } & any;

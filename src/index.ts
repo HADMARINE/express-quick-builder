@@ -5,7 +5,7 @@ import {
   Wrapper as _Wrapper,
   RawWrapper as _RawWrapper,
 } from "./util/ControllerUtil";
-import { serverStarter } from "./util/ServerStarter";
+import serverStarter from "./util/ServerStarter";
 import RestDecorator from "./util/RestDecorator";
 import errorBuilder from "./util/ErrorBuilder";
 
