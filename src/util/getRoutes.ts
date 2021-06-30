@@ -5,6 +5,8 @@ import _logger from "clear-logger";
 
 const logger = _logger.customName("EQB");
 
+// TODO : make this window-compatible!
+
 interface GetRoutesProps {
   path: string;
   router: NodeRequire;

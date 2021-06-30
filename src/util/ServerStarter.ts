@@ -12,7 +12,7 @@ export default function serverStarter(params: {
   port?: number;
   portStrict?: boolean;
   app?: Express;
-  requestHandlers?: RequestHandler[];
+  requestHandlers?: (RequestHandler | [string, ...RequestHandler[]])[];
   routePath?: string;
   customErrorHandler?: RequestHandler;
   customNotFoundHandler?: RequestHandler;
@@ -27,7 +27,29 @@ export default function serverStarter(params: {
   const app = params.app ? params.app : express();
   const server = http.createServer(app);
 
-  if (params.requestHandlers) app.use(params.requestHandlers);
+  if (params.requestHandlers) {
+    params.requestHandlers.forEach((handlers) => {
+      if (!handlers) return;
+      if (
+        Array.isArray(handlers) &&
+        typeof handlers[0] === "string" &&
+        handlers[0] !== undefined
+      ) {
+        const path = handlers.shift();
+        if (!path || typeof path !== "string")
+          throw new Error("Path parsing error");
+        app.use(
+          path,
+          ...(handlers.filter((d) => {
+            if (typeof d === "string") return false;
+            return true;
+          }) as RequestHandler[])
+        );
+        return;
+      }
+      app.use(handlers as RequestHandler);
+    });
+  }
 
   getRoutes(params.routePath).forEach((data) => {
     app.use(data.path || "/", data.router);
