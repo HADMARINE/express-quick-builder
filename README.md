@@ -8,6 +8,8 @@
 
 ### Example projects
 
+See this example projects to implement your code easily.
+
 - [2021-sunrinthon-backend](https://github.com/sunrinhackathon/2021-sunrinthon-backend)
 - [Typescript-Node-Express-Mongodb-Backend (template)](https://github.com/HADMARINE/Typescript-Node-Express-Mongodb-backend)
 
