@@ -13,3 +13,4 @@ yarn-error.log
 .gitignore
 .yarn
 .yarnrc.yml
+.vscode
