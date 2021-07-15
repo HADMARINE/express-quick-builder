@@ -1,43 +1,43 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
-import { codeData, defaultCode, defaultMessage } from "./httpcode";
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { codeData, defaultCode, defaultMessage } from './httpcode';
 import {
   verificationWrapper,
   ProcessorType,
   RecursiveVerifiedTypes,
   PureProcessorType,
-} from "./DataVerify";
+} from './DataVerify';
 
 export type WrappedRequest = {
   verify: {
     body<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
     headers<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
     cookies<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
     signedCookies<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
     query<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
     params<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
-        : any
+        : any,
     ): RecursiveVerifiedTypes<T>;
   };
 } & Request;
@@ -46,7 +46,7 @@ export type WrappedResponse = {
   strict: (
     status: keyof typeof codeData,
     data?: any,
-    options?: ResponseOptions
+    options?: ResponseOptions,
   ) => void;
 } & Response;
 
@@ -54,19 +54,21 @@ export interface ResponseOptions {
   result?: boolean;
   message?: string | null;
   code?: string | null;
+  status?: number | null;
   additionalData?: Record<string, any> | null;
 }
 
 export type WrappedRequestHandler = (
   req: WrappedRequest,
   res: WrappedResponse,
-  next?: NextFunction
+  next?: NextFunction,
 ) => void;
 
 const optionsDefault = {
   result: true,
   message: null,
   code: null,
+  status: null,
   additionalData: {},
 };
 
@@ -97,7 +99,7 @@ export function ResponseFactory(res: Response): WrappedResponse {
   function strict(
     status: keyof typeof codeData,
     data?: any,
-    options: ResponseOptions = {}
+    options: ResponseOptions = {},
   ): void {
     options = Object.assign({}, optionsDefault, options);
     res
@@ -124,11 +126,11 @@ export function ResponseFactory(res: Response): WrappedResponse {
  * @returns {RequestHandler} Returns request handler
  */
 export const Wrapper = (
-  requestHandler: WrappedRequestHandler
+  requestHandler: WrappedRequestHandler,
 ): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
     Promise.resolve(
-      requestHandler(RequestFactory(req), ResponseFactory(res), next)
+      requestHandler(RequestFactory(req), ResponseFactory(res), next),
     ).catch((e) => {
       next(e);
     });
