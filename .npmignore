@@ -11,3 +11,5 @@ TODO.md
 gulpfile.js
 yarn-error.log
 .gitignore
+.yarn
+.yarnrc.yml

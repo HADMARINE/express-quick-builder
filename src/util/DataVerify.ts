@@ -1,18 +1,18 @@
-import ErrorDictionary from "./ErrorDictionary";
-import logger from "clear-logger";
+import ErrorDictionary from './ErrorDictionary';
+import logger from 'clear-logger';
 
 type nully = null;
 
 function isObject(data: any): data is Record<string, any> {
-  return data !== null && typeof data === "object";
+  return data !== null && typeof data === 'object';
 }
 
 function isObjectNullable(data: any): data is Record<string, any> | nully {
-  return data === undefined || data === null || data === "object";
+  return data === undefined || data === null || data === 'object';
 }
 
 function isNumber(data: any): data is number {
-  return typeof data === "number";
+  return typeof data === 'number';
 }
 
 function isNumberNullable(data: any): data is number | nully {
@@ -20,10 +20,10 @@ function isNumberNullable(data: any): data is number | nully {
 }
 
 function isDate(data: any): data is Date {
-  return typeof data === "string";
+  return typeof data === 'string';
 }
 function isDateNullable(data: any): data is Date | nully {
-  return typeof data === "string" || data == null;
+  return typeof data === 'string' || data == null;
 }
 
 function isNotNull<T>(data: T | nully): data is T {
@@ -35,7 +35,7 @@ function isAny<T = any>(data: any): data is T {
 }
 
 function isFunction(data: any): data is Function {
-  return typeof data === "function";
+  return typeof data === 'function';
 }
 
 function isFunctionNullable(data: any): data is Function | nully {
@@ -43,7 +43,7 @@ function isFunctionNullable(data: any): data is Function | nully {
 }
 
 function isString(data: any): data is string {
-  return typeof data === "string";
+  return typeof data === 'string';
 }
 
 function isStringNullable(data: any): data is string | nully {
@@ -59,7 +59,7 @@ function isArrayNullable<T>(data: any): data is T[] | nully {
 }
 
 function isBoolean(data: any): data is boolean {
-  return typeof data === "boolean";
+  return typeof data === 'boolean';
 }
 
 function isBooleanNullable(data: any): data is boolean | nully {
@@ -135,7 +135,7 @@ export const DataTypes = {
 function ArrayParser<T>(data: any, key: string): T[] {
   if (isArray(data)) return data as T[];
   if (isString(data)) {
-    logger.debug("String parsed to array, DO NOT USE THIS IN PRODUCTION!");
+    logger.debug('String parsed to array, DO NOT USE THIS IN PRODUCTION!');
     return returnArray(data);
   }
   throw ErrorDictionary.data.parameterInvalid(key);
@@ -144,7 +144,7 @@ function ArrayParser<T>(data: any, key: string): T[] {
 function verifier<T>(
   data: any,
   dataVerifyFunction: (data: any) => data is T,
-  key: string
+  key: string,
 ): T {
   if (dataVerifyFunction === isAny) {
     return data;
@@ -181,9 +181,9 @@ function verifier<T>(
       if (isBoolean(data)) return data as unknown as T;
       if (isString(data)) {
         switch (data) {
-          case "true":
+          case 'true':
             return true as unknown as T;
-          case "false":
+          case 'false':
             return false as unknown as T;
           default:
             throw ErrorDictionary.data.parameterInvalid(key);
@@ -214,7 +214,11 @@ function verifier<T>(
     }
     case isDate as unknown:
     case isDateNullable as unknown:
-      return new Date(data) as unknown as T;
+      try {
+        return new Date(data) as unknown as T;
+      } catch {
+        throw ErrorDictionary.data.parameterInvalid(key);
+      }
     default:
       if (dataVerifyFunction(data)) {
         return data;
@@ -231,7 +235,7 @@ function verifierBuilder<T>(type: (data: any) => data is T) {
 
 function isObjectProcessorType(data: any): data is ProcessorType {
   // TODO : improve this type guard
-  if (typeof data === "object") return true;
+  if (typeof data === 'object') return true;
   return false;
 }
 
@@ -246,20 +250,20 @@ export type RecursiveVerifiedTypes<T> = {
 };
 
 export type VerifyIteratorFunction<T> = (
-  processors: T extends Record<string, ProcessorType> ? T : any
+  processors: T extends Record<string, ProcessorType> ? T : any,
 ) => RecursiveVerifiedTypes<T>;
 
 function isPureProcessorType(
-  processor: ProcessorType | PureProcessorType
+  processor: ProcessorType | PureProcessorType,
 ): processor is PureProcessorType {
-  return typeof processor !== "object";
+  return typeof processor !== 'object';
 }
 
 export function verificationWrapper(data: Record<string, any>) {
   return function verifyIterator<T>(
     processors: T extends Record<string, ProcessorType | PureProcessorType>
       ? T
-      : any
+      : any,
   ): RecursiveVerifiedTypes<T> {
     const returnData: RecursiveVerifiedTypes<any> = {};
     if (isObjectProcessorType(processors)) {
@@ -279,9 +283,9 @@ export function verificationWrapper(data: Record<string, any>) {
       });
     } else {
       throw ErrorDictionary.custom(
-        "Verification type is invalid!",
+        'Verification type is invalid!',
         500,
-        "VERIFICATION_TYPE_INVALID"
+        'VERIFICATION_TYPE_INVALID',
       );
     }
     return returnData;
@@ -289,7 +293,7 @@ export function verificationWrapper(data: Record<string, any>) {
 }
 
 function returnRecord(data: any): Record<any, any> | null {
-  if (typeof data === "string") {
+  if (typeof data === 'string') {
     try {
       data = JSON.parse(data);
     } catch {
@@ -300,7 +304,7 @@ function returnRecord(data: any): Record<any, any> | null {
 }
 
 function returnArray<T>(data: any): T[] {
-  if (typeof data === "string") {
+  if (typeof data === 'string') {
     try {
       data = JSON.parse(data);
     } catch {

@@ -16,7 +16,6 @@
     "darwin",
     "linux"
   ],
-  "private": false,
   "scripts": {
     "build": "gulp build",
     "test": ""

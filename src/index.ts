@@ -1,13 +1,13 @@
-import { DataTypes as _DataTypes } from "./util/DataVerify";
+import { DataTypes as _DataTypes } from './util/DataVerify';
 import {
   WrappedRequest as _WrappedRequest,
   WrappedResponse as _WrappedResponse,
   Wrapper as _Wrapper,
   RawWrapper as _RawWrapper,
-} from "./util/ControllerUtil";
-import serverStarter from "./util/ServerStarter";
-import RestDecorator from "./util/RestDecorator";
-import errorBuilder from "./util/ErrorBuilder";
+} from './util/ControllerUtil';
+import serverStarter from './util/ServerStarter';
+import RestDecorator from './util/RestDecorator';
+import errorBuilder from './util/ErrorBuilder';
 
 // TYPES
 export type WrappedRequest = _WrappedRequest;
@@ -34,6 +34,10 @@ export const SetEndpointProperties = RestDecorator.setEndpointProperties;
 export const ReturnRawData = RestDecorator.returnRawData;
 export const UseCustomHandler = RestDecorator.useCustomHandler;
 export const SetSuccessMessage = RestDecorator.setSuccessMessage;
+export const SetSuccessCode = RestDecorator.setSuccessCode;
+export const SetSuccessStatus = RestDecorator.setSuccessStatus;
+export const SetDeprecated = RestDecorator.setDeprecated;
+export const DeprecatedSoon = RestDecorator.deprecatedSoon;
 export const QuickDecorator = RestDecorator;
 
 export const ErrorBuilder = errorBuilder;
