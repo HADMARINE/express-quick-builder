@@ -2,6 +2,10 @@
 
 [NPM Package](https://npmjs.com/package/express-quick-builder)
 
+## API Documentation
+
+[APIDOC.md](https://github.com/HADMARINE/express-quick-builder/blob/master/docs/APIDOC.md)
+
 ### Example projects
 
 - [2021-sunrinthon-backend](https://github.com/sunrinhackathon/2021-sunrinthon-backend)
