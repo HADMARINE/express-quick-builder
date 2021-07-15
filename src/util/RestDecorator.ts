@@ -1,6 +1,8 @@
-import { RequestHandler, Router } from "express";
-import { WrappedRequest, ResponseOptions, Wrapper } from "./ControllerUtil";
-import ErrorDictionary from "./ErrorDictionary";
+import { RequestHandler, Router } from 'express';
+import { WrappedRequest, ResponseOptions, Wrapper } from './ControllerUtil';
+import ErrorDictionary from './ErrorDictionary';
+import ErrorHandler from './ErrorHandler';
+import { codeData } from './httpcode';
 
 export type EndpointProcessProperties = Partial<{
   method: METHODS;
@@ -8,7 +10,10 @@ export type EndpointProcessProperties = Partial<{
   returnRawData: boolean;
   path: string | RegExp | (string | RegExp)[];
   successMessage: string;
+  successCode: string;
+  successStatus: keyof typeof codeData;
   noErrorOnNull: boolean;
+  errorBeforeExecution: Error;
 }>;
 
 interface MappersDataTransferInterface {
@@ -17,18 +22,18 @@ interface MappersDataTransferInterface {
 }
 
 export enum METHODS {
-  GET = "get",
-  POST = "post",
-  PUT = "put",
-  PATCH = "patch",
-  DELETE = "delete",
-  HEAD = "head",
-  ALL = "all",
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  PATCH = 'patch',
+  DELETE = 'delete',
+  HEAD = 'head',
+  ALL = 'all',
 }
 
 const validateUnsureValue = (value: any): MappersDataTransferInterface => {
   const valueType = typeof value;
-  if (valueType === "object") {
+  if (valueType === 'object') {
     return value;
   } else {
     return {
@@ -41,7 +46,7 @@ const validateUnsureValue = (value: any): MappersDataTransferInterface => {
 const processHandlers = (
   descriptionValue: MappersDataTransferInterface | RequestHandler,
   middleware: RequestHandler[],
-  properties: EndpointProcessProperties
+  properties: EndpointProcessProperties,
 ): { handlers: RequestHandler[]; properties: EndpointProcessProperties } => {
   const v = validateUnsureValue(descriptionValue);
   const settings: EndpointProcessProperties = properties;
@@ -51,18 +56,33 @@ const processHandlers = (
 
   if (!properties.useCustomHandler) {
     const preHandler = v.handlers[v.handlers.length - 1] as unknown as (
-      req: WrappedRequest
+      req: WrappedRequest,
     ) => any;
 
     const responseOptions: ResponseOptions = {};
 
+    // Handle success return info options
     if (properties.successMessage) {
       responseOptions.message = properties.successMessage;
     }
 
+    if (properties.successCode) {
+      responseOptions.code = properties.successCode;
+    }
+
+    if (properties.successStatus) {
+      responseOptions.status = properties.successStatus;
+    }
+
     v.handlers[v.handlers.length - 1] = Wrapper(async (req, res) => {
+      // Handle errorBeforeExecution
+      if (properties.errorBeforeExecution) {
+        throw properties.errorBeforeExecution;
+      }
+
       const preResult = await preHandler(req);
 
+      // Handle ReturnRawData
       if (properties.returnRawData) {
         res.send(preResult).status(200);
       } else {
@@ -78,26 +98,26 @@ const processHandlers = (
 };
 
 function stringGuard(value: any): value is string {
-  return typeof value === "string";
+  return typeof value === 'string';
 }
 
 const MappingFactory = (method: METHODS) => {
   return (
-    dir: string | RegExp | (string | RegExp)[] = "/",
+    dir: string | RegExp | (string | RegExp)[] = '/',
     ...middleware: RequestHandler[]
   ): MethodDecorator => {
     if (stringGuard(dir)) {
-      dir[0] !== "/" ? (dir = `/${dir}`) : "/";
+      dir[0] !== '/' ? (dir = `/${dir}`) : '/';
     }
     return (target, propertyKey, descriptor: PropertyDescriptor): void => {
       if (!descriptor.value) return;
       const { handlers, properties } = processHandlers(
         descriptor.value,
         middleware,
-        { method, path: dir }
+        { method, path: dir },
       );
       descriptor.value = {
-        type: "controller",
+        type: 'controller',
         handlers,
         properties,
       };
@@ -119,7 +139,7 @@ const SetMiddleware = (middleware: RequestHandler) => {
   return (
     target: any,
     propName: string,
-    description: PropertyDescriptor
+    description: PropertyDescriptor,
   ): void => {
     const v = validateUnsureValue(description.value);
 
@@ -132,7 +152,7 @@ const SetMiddleware = (middleware: RequestHandler) => {
 const UseCustomHandler = (
   target: any,
   propName: string,
-  description: PropertyDescriptor
+  description: PropertyDescriptor,
 ): void => {
   const v = validateUnsureValue(description.value);
 
@@ -145,7 +165,7 @@ const SetSuccessMessage = (message: string) => {
   return (
     target: any,
     propName: string,
-    description: PropertyDescriptor
+    description: PropertyDescriptor,
   ): void => {
     const v = validateUnsureValue(description.value);
 
@@ -155,25 +175,69 @@ const SetSuccessMessage = (message: string) => {
   };
 };
 
-const NoErrorOnNull = (value = true) => {
-  return (
-    target: any,
-    propName: string,
-    description: PropertyDescriptor
-  ): void => {
+const DeprecatedSoon = (
+  target: any,
+  propName: string,
+  description: PropertyDescriptor,
+): void => {
+  const v = validateUnsureValue(description.value);
+
+  const e = ErrorDictionary.endpoint.rules.deprecatedSoon();
+
+  v.properties.successStatus = (e as Record<string, any>).status || 200;
+  v.properties.successCode = (e as Record<string, any>).code || 'OK';
+  v.properties.successMessage = e.message;
+  description.value = v;
+};
+
+const SetDeprecated =
+  (value = true) =>
+  (target: any, propName: string, description: PropertyDescriptor): void => {
     const v = validateUnsureValue(description.value);
 
-    v.properties.noErrorOnNull = value;
+    v.properties.errorBeforeExecution =
+      ErrorDictionary.endpoint.rules.deprecated();
 
     description.value = v;
   };
+
+const SetSuccessCode =
+  (code: string) =>
+  (target: any, propName: string, description: PropertyDescriptor) => {
+    const v = validateUnsureValue(description.value);
+
+    v.properties.successCode = code;
+
+    description.value = v;
+  };
+
+const SetSuccessStatus =
+  (status: keyof typeof codeData) =>
+  (target: any, propName: string, description: PropertyDescriptor) => {
+    const v = validateUnsureValue(description.value);
+
+    v.properties.successStatus = status;
+
+    description.value = v;
+  };
+
+const NoErrorOnNull = (
+  target: any,
+  propName: string,
+  description: PropertyDescriptor,
+): void => {
+  const v = validateUnsureValue(description.value);
+
+  v.properties.noErrorOnNull = true;
+
+  description.value = v;
 };
 
 const SetEndpointProperties = (value: EndpointProcessProperties) => {
   return (
     target: any,
     propName: string,
-    description: PropertyDescriptor
+    description: PropertyDescriptor,
   ): void => {
     const v = validateUnsureValue(description.value);
 
@@ -187,7 +251,7 @@ const ReturnRawData = (value = true) => {
   return (
     target: any,
     propName: string,
-    description: PropertyDescriptor
+    description: PropertyDescriptor,
   ): void => {
     const v = validateUnsureValue(description.value);
 
@@ -198,7 +262,7 @@ const ReturnRawData = (value = true) => {
 };
 
 const Controller = <T extends new (...args: any[]) => {}>(
-  target: T
+  target: T,
 ): {
   new (...args: any[]): { router: Router } & any;
   prototype: { router: Router };
@@ -209,9 +273,9 @@ const Controller = <T extends new (...args: any[]) => {}>(
     constructor(...args: any[]) {
       super();
       for (const key of Object.getOwnPropertyNames(target.prototype)) {
-        if (key === "constructor") continue;
+        if (key === 'constructor') continue;
         const value = target.prototype[key];
-        if (value?.type !== "controller") continue;
+        if (value?.type !== 'controller') continue;
 
         const { handlers, properties } = value as {
           handlers: RequestHandler[];
@@ -219,10 +283,10 @@ const Controller = <T extends new (...args: any[]) => {}>(
         };
 
         if (!properties.method) {
-          throw new Error("METHOD NOT DECORATED - " + key);
+          throw new Error('METHOD NOT DECORATED - ' + key);
         }
 
-        this.router[properties.method](properties.path || "/", ...handlers);
+        this.router[properties.method](properties.path || '/', ...handlers);
       }
     }
   };
@@ -233,8 +297,12 @@ export default {
   middleware: SetMiddleware,
   useCustomHandler: UseCustomHandler,
   setSuccessMessage: SetSuccessMessage,
+  setSuccessCode: SetSuccessCode,
+  setSuccessStatus: SetSuccessStatus,
   noErrorOnNull: NoErrorOnNull,
   setEndpointProperties: SetEndpointProperties,
   returnRawData: ReturnRawData,
+  setDeprecated: SetDeprecated,
+  deprecatedSoon: DeprecatedSoon,
   mappings: Mappings,
 };
