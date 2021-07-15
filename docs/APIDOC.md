@@ -99,6 +99,64 @@ It's simple.
 
 # Decorators
 
+> #### Note: Decorator name rule
+>
+> If decorator name starts with "Set" (like : SetMiddleware) or MappingFunctions (GetMapping, PostMapping, etc...), the decorator is wrapped with parameter providing closure.
+> Use like <code>@SetMiddleware(Middleware)</code>
+> Else not, Just use like <code>@Controller</code>
+
+### Mapping functions
+
+> Mapping functions has 2 parameters, both are not required.
+> <code>GetMapping(dir, ...middlewares)</code>
+> |parameter|type|default|behaviour|
+> |:-:|:-:|:-|:-|
+> |dir|<code>string \| RegExp \| (string\|RegExp)[]</code>|/|set dirs of endpoint.|
+> |middleware|<code>RequestHandler[]</code>|undefined|Sets middleware of endpoint|
+> Usage, all of below are allowed.
+>
+> 1. @GetMapping() : GET / , no middleware
+> 2. @GetMapping('/hello') : GET /hello, no middleware
+> 3. @GetMapping('hello') : GET /hello, no middleware
+> 4. @GetMapping(undefined, SuchMiddleware) : GET /, Middlewares : SuchMiddlware
+> 5. @GetMapping('hello', M1, M2, M3) : GET /hello, Middlewares : M1, M2, M3
+
+- GetMapping
+- PostMapping
+- PatchMapping
+- DeleteMapping
+- PutMapping
+- HeadMapping
+- AllMapping : routes all method to this endpoint
+
+### Endpoint Decorators
+
+- SetMiddleware(...middleware) : Sets middleware
+- UseCustomHandler : Use raw express handler
+- SetSuccessMessage(message: string) : Sets message when success
+- SetSuccessCode(code: string) : Set code when success
+- SetSuccessStatus(status: number) : Set HTTP Status code when success
+- DeprecatedSoon : Return message that notifies it will be deprecated.
+- SetDeprecated : Send deprecated error (CODE : API_DEPRECATED), and abort execution before it executes.
+- NoErrorOnNull : Do not send error when null returned
+- ReturnRawData : Return raw data instead of returning JSON value.
+- SetEndpointProperties(properties) : Set endpoint properties (properties below)
+
+> Property parameter of SetEndpointProperties
+> method: METHODS;
+> useCustomHandler: boolean;
+> returnRawData: boolean;
+> path: string | RegExp | (string | RegExp)[];
+> successMessage: string;
+> successCode: string;
+> successStatus: keyof typeof codeData;
+> noErrorOnNull: boolean;
+> errorBeforeExecution: Error;
+
+### Class Decorators
+
+- Controller : Set class to controller
+
 # Request Data Verifier
 
 ## Usage
@@ -155,3 +213,7 @@ It's simple.
 #### Additional
 
 If you want to verify certain data, create [TypeGuard (TS Handbook)](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) function and apply it.
+
+# Questions
+
+Send your questions to Issue tab, or directly to my email: [contact@hadmarine.com](mailto:contact@hadmarine.com)
