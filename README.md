@@ -1,6 +1,6 @@
 # Express-Quick-Builder
 
-[NPM Package](https://npmjs.com/package/express-quick-builder)
+[NPM Package page](https://npmjs.com/package/express-quick-builder)
 
 ## API Documentation
 
@@ -16,7 +16,6 @@ See this example projects to implement your code easily.
 ### Announcement
 
 - Currently on beta testing. I recommend not to use on production product.
-- Usage manual and API documentation are currently preparing. Will be provided soon.
 
 ### Contribution
 
