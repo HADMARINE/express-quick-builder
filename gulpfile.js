@@ -4,7 +4,7 @@ var fs = require('fs');
 
 gulp.task('build', function () {
   if (fs.existsSync('dist')) {
-    fs.rmdirSync('dist', { recursive: true });
+    fs.rmSync('dist', { recursive: true });
   }
 
   var merge = require('merge2');
