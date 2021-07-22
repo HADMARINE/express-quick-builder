@@ -1,12 +1,12 @@
-import _logger from "clear-logger";
-import http from "http";
-import chalk from "chalk";
-import express, { Express, RequestHandler } from "express";
-import getRoutes from "./getRoutes";
-import ErrorHandler from "./ErrorHandler";
-const pkg = require("../../package.json");
+import _logger from 'clear-logger';
+import http from 'http';
+import chalk from 'chalk';
+import express, { Express, RequestHandler } from 'express';
+import getRoutes from './getRoutes';
+import ErrorHandler from './ErrorHandler';
+const pkg = require('../../package.json');
 
-const logger = _logger.customName("EQB");
+const logger = _logger.customName('EQB');
 
 export default function serverStarter(params: {
   port?: number;
@@ -32,18 +32,18 @@ export default function serverStarter(params: {
       if (!handlers) return;
       if (
         Array.isArray(handlers) &&
-        typeof handlers[0] === "string" &&
+        typeof handlers[0] === 'string' &&
         handlers[0] !== undefined
       ) {
         const path = handlers.shift();
-        if (!path || typeof path !== "string")
-          throw new Error("Path parsing error");
+        if (!path || typeof path !== 'string')
+          throw new Error('Path parsing error');
         app.use(
           path,
           ...(handlers.filter((d) => {
-            if (typeof d === "string") return false;
+            if (typeof d === 'string') return false;
             return true;
-          }) as RequestHandler[])
+          }) as RequestHandler[]),
         );
         return;
       }
@@ -52,18 +52,18 @@ export default function serverStarter(params: {
   }
 
   getRoutes(params.routePath).forEach((data) => {
-    app.use(data.path || "/", data.router);
+    app.use(data.path || '/', data.router);
   });
 
   app.use(
     params.customNotFoundHandler ||
       ((req) => {
-        const err: any = new Error("Page not found");
+        const err: any = new Error('Page not found');
         err.status = 404;
-        err.code = "PAGE_NOT_FOUND";
+        err.code = 'PAGE_NOT_FOUND';
         err.data = { directory: `${req.method} ${req.url}` };
         throw err;
-      })
+      }),
   );
 
   app.use(params.customErrorHandler ? params.customErrorHandler : ErrorHandler);
@@ -71,7 +71,7 @@ export default function serverStarter(params: {
   const listenPort = listen(params.port || 61000, server, {
     portStrict: params.portStrict,
     appName:
-      params.appName || "EXPRESS API SERVER powered by express-quick-builder",
+      params.appName || 'EXPRESS API SERVER powered by express-quick-builder',
   });
 
   return {
@@ -84,16 +84,16 @@ export default function serverStarter(params: {
 function listen(
   port: number,
   server: http.Server,
-  settings: Partial<{ portStrict: boolean; appName: string }>
+  settings: Partial<{ portStrict: boolean; appName: string }>,
 ): number {
   if (port <= 0 || port >= 65536) {
     logger.warn(`PORT Range is Invalid. Recieved port : ${port}`);
 
     if (settings.portStrict === true) {
       logger.error(
-        "Set portStrict to false on your ServerStarter if you want to execute anyway."
+        'Set portStrict to false on your ServerStarter if you want to execute anyway.',
       );
-      throw new Error("PORT STRICT ERROR");
+      throw new Error('PORT STRICT ERROR');
     }
     port = 20000;
     logger.info(`Retrying with Port ${port}`);
@@ -101,28 +101,28 @@ function listen(
   server.listen(port);
 
   let isError = false;
-  server.once("error", (err: any) => {
+  server.once('error', (err: any) => {
     if (settings.portStrict === true) {
       logger.error(`Port ${port} is already in use.`);
       logger.info(
-        "Set portStrict to false on your ServerStarter if you want to execute anyway."
+        'Set portStrict to false on your ServerStarter if you want to execute anyway.',
       );
-      throw new Error("PORT STRICT");
+      throw new Error('PORT STRICT');
     }
-    if (err.code === "EADDRINUSE") {
+    if (err.code === 'EADDRINUSE') {
       logger.info(
-        `Port ${port} is currently in use. Retrying with port ${port + 1}`
+        `Port ${port} is currently in use. Retrying with port ${port + 1}`,
       );
       const newPort = port > 65535 ? 20000 : port + 1;
       port = listen(newPort, server, settings);
       isError = true;
     }
   });
-  server.once("listening", () => {
+  server.once('listening', () => {
     if (!isError) {
       logger.success(
         chalk.black.bgGreen(`${settings.appName} started on port `) +
-          chalk.green.bold(` ${port}`)
+          chalk.green.bold(` ${port}`),
       );
     }
   });
