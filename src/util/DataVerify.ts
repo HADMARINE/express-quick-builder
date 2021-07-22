@@ -107,7 +107,7 @@ export type PureProcessorType =
   | typeof isBooleanNullable
   | ((data: any) => data is unknown);
 
-export const DataTypes = {
+const __DataTypes = {
   object: isObject,
   objectNull: isObjectNullable,
   number: isNumber,
@@ -131,6 +131,8 @@ export const DataTypes = {
   boolean: isBoolean,
   booleanNull: isBooleanNullable,
 };
+
+export default __DataTypes;
 
 function ArrayParser<T>(data: any, key: string): T[] {
   if (isArray(data)) return data as T[];
