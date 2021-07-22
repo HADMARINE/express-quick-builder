@@ -2,6 +2,8 @@
 
 [NPM Package page](https://npmjs.com/package/express-quick-builder)
 
+> Recent Update (V.2.1.0) : Fully supports windows!
+
 ## API Documentation
 
 [APIDOC.md](https://github.com/HADMARINE/express-quick-builder/blob/master/docs/APIDOC.md)
@@ -15,7 +17,7 @@ See this example projects to implement your code easily.
 
 ### Announcement
 
-- Currently on beta testing. I recommend not to use on production product.
+- Currently on beta testing. I recommend not to use on production product rather than toy projects.
 
 ### Contribution
 
