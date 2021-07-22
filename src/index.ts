@@ -1,4 +1,4 @@
-import { DataTypes as _DataTypes } from './util/DataVerify';
+import _DataTypes from './util/DataVerify';
 import {
   WrappedRequest as _WrappedRequest,
   WrappedResponse as _WrappedResponse,
