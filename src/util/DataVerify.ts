@@ -1,13 +1,14 @@
 import ErrorDictionary from './ErrorDictionary';
 
 class DataVerifierBlueprint<PropertiesType> {
-  properties: PropertiesType;
+  properties: Partial<PropertiesType>;
 
-  constructor(properties: PropertiesType) {
-    this.properties = properties;
+  constructor() {
+    this.properties = {};
   }
 
-  public setProperties(properties: PropertiesType): this {
+  public setProperties(properties: Partial<PropertiesType>): this {
+    this.properties = properties;
     return this;
   }
 }
@@ -18,6 +19,12 @@ interface DataVerifierInterface<T> {
 }
 
 type nully = null | undefined;
+
+type ProcessorType = {
+  [key: string]: ProcessorType | PureProcessorType;
+};
+
+type PureProcessorType = null;
 
 function isNully(data: any): boolean {
   if (data === null || data === undefined) {
@@ -175,26 +182,90 @@ class ObjectNullVerifier
   }
 }
 class ArrayVerifier<T>
-  extends DataVerifierBlueprint<{ verifyArrayValues: boolean }>
+  extends DataVerifierBlueprint<{
+    arrayValueVerifier: DataVerifierInterface<any>;
+  }>
   implements DataVerifierInterface<Array<T>>
 {
   typeguard(data: any): data is Array<T> {
-    if (this.properties.verifyArrayValues) {
-    }
-    return typeof data === 'string';
+    return Array.isArray(data);
   }
 
-  transformer(data: any, key: string): string {
+  transformer(data: any, key: string): Array<T> {
+    if (this.properties.arrayValueVerifier) {
+      if (this.typeguard(data) && data) {
+        if (
+          data.filter((d) => !this.properties.arrayValueVerifier?.typeguard(d))
+            .length !== 0
+        ) {
+          throw ErrorDictionary.data.parameterInvalid(key);
+        }
+        return data;
+      }
+      throw ErrorDictionary.data.parameterInvalid(key);
+    }
     if (this.typeguard(data) && data) return data;
     throw ErrorDictionary.data.parameterInvalid(key);
   }
 }
-class ArrayNullVerifier
+class ArrayNullVerifier<T>
+  extends DataVerifierBlueprint<{
+    arrayValueVerifier: DataVerifierInterface<T>;
+  }>
+  implements DataVerifierInterface<Array<T> | nully>
+{
+  typeguard(data: any): data is Array<T> | nully {
+    return Array.isArray(data) || isNully(data);
+  }
+
+  transformer(data: any, key: string): Array<T> | nully {
+    if (isNully(data)) {
+      return null;
+    }
+    if (this.properties.arrayValueVerifier) {
+      if (this.typeguard(data) && data) {
+        if (
+          data.filter((d) => !this.properties.arrayValueVerifier?.typeguard(d))
+            .length !== 0
+        ) {
+          throw ErrorDictionary.data.parameterInvalid(key);
+        }
+        return data;
+      }
+      throw ErrorDictionary.data.parameterInvalid(key);
+    }
+    if (this.typeguard(data) && data) return data;
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+class BooleanVerifier
+  extends DataVerifierBlueprint<null>
+  implements DataVerifierInterface<boolean>
+{
+  typeguard(data: any): data is boolean {
+    return typeof data === 'boolean';
+  }
+
+  transformer(data: any, key: string): boolean {
+    if (this.typeguard(data)) return data
+    if ((new StringVerifier()).typeguard(data)) {
+      switch (data) {
+        case 'true':
+          return true;
+        case 'false':
+          return false;
+        default:
+          throw ErrorDictionary.data.parameterInvalid(key);
+      }
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+}
+class StringVerifier
   extends DataVerifierBlueprint<null>
   implements DataVerifierInterface<string>
 {
   typeguard(data: any): data is string {
-    return typeof data === 'string';
+    return typeof data === 'boolean';
   }
 
   transformer(data: any, key: string): string {
