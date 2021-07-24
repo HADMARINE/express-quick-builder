@@ -113,6 +113,7 @@ It's simple.
 > |:-:|:-:|:-|:-|
 > |dir|<code>string \| RegExp \| (string\|RegExp)[]</code>|/|set dirs of endpoint.|
 > |middleware|<code>RequestHandler[]</code>|undefined|Sets middleware of endpoint|
+>
 > Usage, all of below are allowed.
 >
 > 1. @GetMapping() : GET / , no middleware
