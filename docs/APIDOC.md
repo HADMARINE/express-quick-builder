@@ -144,14 +144,15 @@ It's simple.
 - SetEndpointProperties(properties) : Set endpoint properties (properties below)
 
 > Property parameter of SetEndpointProperties
-> method: METHODS;
-> useCustomHandler: boolean;
-> returnRawData: boolean;
-> path: string | RegExp | (string | RegExp)[];
-> successMessage: string;
-> successCode: string;
-> successStatus: keyof typeof codeData;
-> noErrorOnNull: boolean;
+>
+> method: METHODS;<br>
+> useCustomHandler: boolean;<br>
+> returnRawData: boolean;<br>
+> path: string | RegExp | (string | RegExp)[];<br>
+> successMessage: string;<br>
+> successCode: string;<br>
+> successStatus: keyof typeof codeData;<br>
+> noErrorOnNull: boolean;<br>
 > errorBeforeExecution: Error;
 
 ### Class Decorators
