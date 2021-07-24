@@ -69,22 +69,7 @@ function isBooleanNullable(data: any): data is boolean | nully {
 export type ProcessorType = {
   [key: string]:
     | ProcessorType
-    | typeof isObject
-    | typeof isObjectNullable
-    | typeof isNumber
-    | typeof isNumberNullable
-    | typeof isDate
-    | typeof isDateNullable
-    | typeof isNotNull
-    | typeof isAny
-    | typeof isFunction
-    | typeof isFunctionNullable
-    | typeof isString
-    | typeof isStringNullable
-    | typeof isArray
-    | typeof isArrayNullable
-    | typeof isBoolean
-    | typeof isBooleanNullable
+    | PureProcessorType
     | ((data: any) => data is unknown);
 };
 
@@ -104,8 +89,7 @@ export type PureProcessorType =
   | typeof isArray
   | typeof isArrayNullable
   | typeof isBoolean
-  | typeof isBooleanNullable
-  | ((data: any) => data is unknown);
+  | typeof isBooleanNullable;
 
 const __DataTypes = {
   object: isObject,
