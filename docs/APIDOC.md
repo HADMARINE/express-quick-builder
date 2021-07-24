@@ -4,6 +4,8 @@
 
 ### TOC
 
+To be updated
+
 ## Setup
 
 ### 1. Initialising ServerStarter
@@ -190,8 +192,10 @@ It's simple.
 
 > #### Error return conditions
 >
-> - If data is null but the data type does not allow nully value, throws parameterNull error.<br>CODE: PARAMETER_NOT_PROVIDED
-> - If data is invalid, throws parameterInvalid error.<br>CODE: PARAMETER_INVALID
+> - If data is null but the data type does not allow nully value, throws parameterNull error.<br>error code: PARAMETER_NOT_PROVIDED
+> - If data is invalid, throws parameterInvalid error.<br>error code: PARAMETER_INVALID
+>
+> You can access those codes by : error.code
 
 |     name     | behaviour                                                                                                                                                                                                                          |
 | :----------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -218,4 +222,4 @@ If you want to verify certain data, create [TypeGuard (TS Handbook)](https://www
 
 # Questions
 
-Send your questions to Issue tab, or directly to my email: [contact@hadmarine.com](mailto:contact@hadmarine.com)
+Send your questions to Issue tab, or directly to my email: [contact@hadmarine.com](mailto:contact@hadmarine.com), or [Telegram](https://t.me/hadmarine)
