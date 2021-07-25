@@ -119,12 +119,17 @@ function returnArray<T>(data: any): T[] {
 }
 
 function ArrayParser<T>(data: any, key: string): T[] {
-  if (new ArrayVerifier().typeguard(data)) return data as T[];
-  if (new StringVerifier().typeguard(data)) {
-    logger.debug('String parsed to array, DO NOT USE THIS IN PRODUCTION!');
-    return returnArray(data);
+  try {
+    if (new ArrayVerifier().typeguard(data)) return data as T[];
+    if (new StringVerifier().typeguard(data)) {
+      const r = returnArray<T>(data);
+      logger.debug('String parsed to array, DO NOT USE THIS IN PRODUCTION!');
+      return r;
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+  } catch {
+    throw ErrorDictionary.data.parameterInvalid(key);
   }
-  throw ErrorDictionary.data.parameterInvalid(key);
 }
 
 export class StringVerifier
@@ -292,7 +297,7 @@ export class ObjectNullVerifier
 }
 export class ArrayVerifier<T = any>
   extends DataVerifierBlueprint<{
-    arrayValueVerifier: DataVerifierInterface<T>;
+    valueVerifier: DataVerifierInterface<T>;
     preciseTypeguard: boolean;
   }>
   implements DataVerifierInterface<Array<T>>
@@ -303,11 +308,10 @@ export class ArrayVerifier<T = any>
     }
     try {
       data = ArrayParser(data, '');
-      if (this.properties.arrayValueVerifier) {
+      if (this.properties.valueVerifier) {
         if (
-          data.filter(
-            (d: any) => !this.properties.arrayValueVerifier?.typeguard(d),
-          ).length !== 0
+          data.filter((d: any) => !this.properties.valueVerifier?.typeguard(d))
+            .length !== 0
         ) {
           return false;
         }
@@ -332,7 +336,7 @@ export class ArrayVerifier<T = any>
     data = ArrayParser(data, key);
     if (this.typeguard(data) && data) {
       if (
-        data.filter((d) => !this.properties.arrayValueVerifier?.typeguard(d))
+        data.filter((d) => !this.properties.valueVerifier?.typeguard(d))
           .length !== 0
       ) {
         throw ErrorDictionary.data.parameterInvalid(key);
@@ -348,14 +352,14 @@ export class ArrayVerifier<T = any>
     throw ErrorDictionary.data.parameterInvalid(key);
   }
 
-  transformer = this.properties.arrayValueVerifier
+  transformer = this.properties.valueVerifier
     ? this.arrayVerifyingTransformer
     : this.plainTransformer;
 }
 
 export class ArrayNullVerifier<T = any>
   extends DataVerifierBlueprint<{
-    arrayValueVerifier: DataVerifierInterface<T>;
+    valueVerifier: DataVerifierInterface<T>;
     preciseTypeguard: boolean;
   }>
   implements DataVerifierInterface<Array<T> | nully>
@@ -366,11 +370,10 @@ export class ArrayNullVerifier<T = any>
     }
     try {
       data = ArrayParser(data, '');
-      if (this.properties.arrayValueVerifier) {
+      if (this.properties.valueVerifier) {
         if (
-          data.filter(
-            (d: any) => !this.properties.arrayValueVerifier?.typeguard(d),
-          ).length !== 0
+          data.filter((d: any) => !this.properties.valueVerifier?.typeguard(d))
+            .length !== 0
         ) {
           return false;
         }
@@ -398,7 +401,7 @@ export class ArrayNullVerifier<T = any>
     data = ArrayParser(data, key);
     if (this.typeguard(data) && data) {
       if (
-        data.filter((d) => !this.properties.arrayValueVerifier?.typeguard(d))
+        data.filter((d) => !this.properties.valueVerifier?.typeguard(d))
           .length !== 0
       ) {
         throw ErrorDictionary.data.parameterInvalid(key);
@@ -416,7 +419,7 @@ export class ArrayNullVerifier<T = any>
     throw ErrorDictionary.data.parameterInvalid(key);
   }
 
-  transformer = this.properties.arrayValueVerifier
+  transformer = this.properties.valueVerifier
     ? this.arrayVerifyingTransformer
     : this.plainTransformer;
 }
@@ -532,7 +535,7 @@ const __DataTypes = {
   },
   array<T>(
     props: Partial<{
-      arrayValueVerifier: DataVerifierInterface<T>;
+      valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
     }>,
   ) {
@@ -540,7 +543,7 @@ const __DataTypes = {
   },
   arrayNull<T>(
     props: Partial<{
-      arrayValueVerifier: DataVerifierInterface<T>;
+      valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
     }>,
   ) {
