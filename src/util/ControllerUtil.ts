@@ -3,7 +3,7 @@ import { codeData, defaultCode, defaultMessage } from './httpcode';
 import {
   verificationWrapper,
   ProcessorType,
-  RecursiveVerifiedTypes,
+  RecursiveVerifiedType,
   PureProcessorType,
 } from './DataVerify';
 
@@ -13,32 +13,32 @@ export type WrappedRequest = {
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
     headers<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
     cookies<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
     signedCookies<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
     query<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
     params<T>(
       processors: T extends Record<string, ProcessorType | PureProcessorType>
         ? T
         : any,
-    ): RecursiveVerifiedTypes<T>;
+    ): RecursiveVerifiedType<T>;
   };
 } & Request;
 
