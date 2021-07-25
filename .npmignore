@@ -3,6 +3,8 @@ node_modules
 .eslintrc.js
 .npmignore
 .prettierignore
+.prettierrc.json
+.pnp.js
 SECURITY.md
 tsconfig.json
 tslint.json
@@ -14,3 +16,4 @@ yarn-error.log
 .yarn
 .yarnrc.yml
 .vscode
+.github
