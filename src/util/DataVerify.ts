@@ -29,9 +29,9 @@ export type PureProcessorType = ReturnType<ValueOf<typeof __DataTypes>>;
 
 export type RecursiveVerifiedType<T> = {
   [P in keyof T]: T[P] extends DataVerifierInterface<any>
-    ? TypeGuard<T[P]['typeguard']> extends null | undefined
-      ? NonNullable<TypeGuard<T[P]['typeguard']>> | null
-      : TypeGuard<T[P]['typeguard']>
+    ? Extract<TypeGuard<T[P]['typeguard']>, nully> extends never
+      ? TypeGuard<T[P]['typeguard']>
+      : Exclude<TypeGuard<T[P]['typeguard']>, nully> | null
     : T[P] extends Record<string, any>
     ? RecursiveVerifiedType<T[P]>
     : any;
