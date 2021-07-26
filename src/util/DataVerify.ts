@@ -55,14 +55,20 @@ function verifier<T>(
   dataVerifier: DataVerifierInterface<T>,
   key: string,
 ): T {
+  //checking null by logical idea
+  if (isNully(data) && !dataVerifier.typeguard(data)) {
+    throw ErrorDictionary.data.parameterNull(key);
+  }
   return dataVerifier.transformer(data, key);
 }
 
-export function verificationWrapper(data: Record<string, any>) {
+export function verificationWrapper(globalData: Record<string, any>) {
   return function verifyIterator<T>(
     processors: T extends Record<string, ProcessorType | PureProcessorType>
       ? T
       : any,
+    data: Record<string, any> = globalData,
+    objectHierarchy: Array<string> = [],
   ): RecursiveVerifiedType<T> {
     const returnData: RecursiveVerifiedType<any> = {};
     if (isObjectProcessorType(processors)) {
@@ -70,15 +76,24 @@ export function verificationWrapper(data: Record<string, any>) {
         if (!isPureProcessorType(processor)) {
           // Not Pure processor type
           if (!processor) {
-            throw ErrorDictionary.data.parameterNull(key);
+            // Weird thing came inside.
+            logger.debug('Processor is invalid!');
+            process.exit(1);
           }
 
-          const _result = verifyIterator(processor);
+          const _result = verifyIterator(processor, data[key], [
+            ...objectHierarchy,
+            key,
+          ]);
           Object.assign(returnData, { [key]: _result });
           return;
         }
         // Pure Processor type
-        const result = verifier(data[key], processor, key); //verifierBuilder(value)(data, key);
+        const result = verifier(
+          data[key],
+          processor,
+          [...objectHierarchy, key].reduce((acc, cur) => `${acc}.${cur}`),
+        ); //verifierBuilder(value)(data, key);
         Object.assign(returnData, { [key]: result });
       });
     } else {
@@ -159,6 +174,70 @@ export class StringNullVerifier
     }
     if (data) if (this.typeguard(data) && data) return data;
     throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
+export class NumberVerifier
+  extends DataVerifierBlueprint<{ preciseTypeguard: boolean }>
+  implements DataVerifierInterface<number>
+{
+  rough_typeguard(data: any): data is number {
+    return typeof data === 'number';
+  }
+
+  precise_typeguard(data: any): data is number {
+    if (typeof data === 'number') return true;
+    try {
+      parseFloat(data);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  typeguard = this.properties.preciseTypeguard
+    ? this.precise_typeguard
+    : this.rough_typeguard;
+
+  transformer(data: any, key: string): number {
+    if (this.typeguard(data) && data) return data;
+    try {
+      return parseFloat(data);
+    } catch {
+      throw ErrorDictionary.data.parameterInvalid(key);
+    }
+  }
+}
+export class NumberNullVerifier
+  extends DataVerifierBlueprint<{ preciseTypeguard: boolean }>
+  implements DataVerifierInterface<number | nully>
+{
+  rough_typeguard(data: any): data is number | nully {
+    return typeof data === 'number' || isNully(data);
+  }
+
+  precise_typeguard(data: any): data is number | nully {
+    if (typeof data === 'number' || isNully(data)) return true;
+    try {
+      parseFloat(data);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  typeguard = this.properties.preciseTypeguard
+    ? this.precise_typeguard
+    : this.rough_typeguard;
+
+  transformer(data: any, key: string): number | nully {
+    if (this.typeguard(data) && data) return data;
+    if (isNully(data)) return null;
+    try {
+      return parseFloat(data);
+    } catch {
+      throw ErrorDictionary.data.parameterInvalid(key);
+    }
   }
 }
 
@@ -554,6 +633,12 @@ const __DataTypes = {
   },
   booleanNull(...props: ConstructorParameters<typeof BooleanNullVerifier>) {
     return new BooleanNullVerifier(...props);
+  },
+  number(...props: ConstructorParameters<typeof NumberVerifier>) {
+    return new NumberVerifier(...props);
+  },
+  numberNull(...props: ConstructorParameters<typeof NumberNullVerifier>) {
+    return new NumberNullVerifier(...props);
   },
   notNull(...props: ConstructorParameters<typeof NotNullVerifier>) {
     return new NotNullVerifier(...props);
