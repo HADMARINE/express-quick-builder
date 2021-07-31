@@ -165,7 +165,9 @@ It's simple.
 
 ## Usage
 
-<code>const { value } = req.verify.query({ value: DataTypes.string })</code>
+<code>const { value, value2 } = req.verify.query({ value: DataTypes.string(), value2: DataTypes.number() }) // value is string, value2 is number</code>
+
+> **NOTE!** Data verifier is a class, so you must initialize by adding parenthesis (brackets), or the generic type will not work properly.
 
 ```typescript
   import { Controller, GetMapping, ErrorBuilder, DataTypes } from 'express-quick-builder';
@@ -177,7 +179,7 @@ It's simple.
 
           // HERE!
           const { value } = req.verify.query({
-              value: DataTypes.string
+              value: DataTypes.string()
           })
 
           const result: boolean = await AwaitFunction();
@@ -216,9 +218,72 @@ It's simple.
 |   boolean    | Verify boolean, try parse string value to bool ("true" or "false")                                                                                                                                                                 |
 | booleanNull  | Works same as boolean, null allowed                                                                                                                                                                                                |
 
-#### Additional
+#### How to create a Custom Verifier
 
-If you want to verify certain data, create [TypeGuard (TS Handbook)](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) function and apply it.
+You must create a class with extension of <code>DataVerifierBlueprint</code> and implementation of <code>DataVerifierInterface</code>.
+
+Two class and interface, respectively, has generic type parameter.
+
+- DataVerifierBlueprint\<T>
+  - T: Defines Parameter of class constructor and <code>this.properties</code>.
+  - You can access this.properties only inside of class you extended. Type of it is not limited, but object type is usually used.
+- DataVerifierInterface\<T>
+  - T: Defines verifying type of this class. This type will applied to the verified result.
+  - You have to implement 2 functions, typeguard and transformer.
+    - typeguard : this function is typeguard of the type you defined on the interface generic type parameter. See details at [TypeGuard (TS Handbook)](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types)
+    - transformer : this function is used to perform data verification and transformation on the verifier. You must return the value, with the type that you decided and defined to verify.\
+
+##### Examples
+
+```typescript
+// String verifier
+class StringVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<string>
+{
+  typeguard(data: any): data is string {
+    return typeof data === 'string';
+  }
+
+  transformer(data: any, key: string): string {
+    if (this.typeguard(data) && data) return data;
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
+// Number verifier
+class NumberVerifier
+  extends DataVerifierBlueprint<{ preciseTypeguard: boolean }>
+  implements DataVerifierInterface<number>
+{
+  rough_typeguard(data: any): data is number {
+    return typeof data === 'number';
+  }
+
+  precise_typeguard(data: any): data is number {
+    if (typeof data === 'number') return true;
+    try {
+      parseFloat(data);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  typeguard = this.properties.preciseTypeguard // this method was used to improve performance of the code.
+    ? this.precise_typeguard
+    : this.rough_typeguard;
+
+  transformer(data: any, key: string): number {
+    if (this.typeguard(data) && data) return data;
+    try {
+      return parseFloat(data);
+    } catch {
+      throw ErrorDictionary.data.parameterInvalid(key);
+    }
+  }
+}
+```
 
 # Questions
 
