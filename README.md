@@ -1,8 +1,8 @@
 # Express-Quick-Builder
 
 [NPM Package page](https://npmjs.com/package/express-quick-builder)
-
-> Recent Update (V.2.1.0) : Fully supports windows!
+> Update (V.3.0.0 rc 12) Update DataVerifier, refactored codes and improved scalability.
+> Update (V.2.1.0) : Fully supports windows!
 
 ## API Documentation
 
