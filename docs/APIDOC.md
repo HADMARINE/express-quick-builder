@@ -1,6 +1,5 @@
+Express-Quick-Builder
 # API Documentation
-
-## Express-Quick-Builder
 
 ### Table of Contents
 
