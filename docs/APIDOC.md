@@ -2,9 +2,30 @@
 
 ## Express-Quick-Builder
 
-### TOC
+### Table of Contents
 
-To be updated
+- [API Documentation](#api-documentation)
+  * [Express-Quick-Builder](#express-quick-builder)
+    + [Table of Contents](#table-of-contents)
+  * [Setup](#setup)
+    + [1. Initialising ServerStarter](#1-initialising-serverstarter)
+      - [Usage](#usage)
+      - [Parameters](#parameters)
+      - [Return Value](#return-value)
+    + [2. Initialising Controller](#2-initialising-controller)
+- [Decorators](#decorators)
+      - [Note: Decorator name rule](#note--decorator-name-rule)
+    + [Mapping functions](#mapping-functions)
+    + [Endpoint Decorators](#endpoint-decorators)
+    + [Class Decorators](#class-decorators)
+- [Request Data Verifier](#request-data-verifier)
+  * [Usage](#usage-1)
+  * [DataTypes](#datatypes)
+      - [Error return conditions](#error-return-conditions)
+      - [How to create a Custom Verifier](#how-to-create-a-custom-verifier)
+        * [Examples](#examples)
+- [Questions](#questions)
+
 
 ## Setup
 
