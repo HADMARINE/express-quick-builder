@@ -17,3 +17,5 @@ yarn-error.log
 .yarnrc.yml
 .vscode
 .github
+dist/test/*
+_deprecated_*

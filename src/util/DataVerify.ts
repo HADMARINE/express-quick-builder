@@ -248,7 +248,12 @@ export class DateVerifier
   precise_typeguard(data: any): data is Date {
     if (this.rough_typeguard(data)) {
       try {
-        new Date(data);
+        const d = new Date(data);
+
+        if (isNaN(d as any)) {
+          return false;
+        }
+
         return true;
       } catch {
         return false;
@@ -258,7 +263,11 @@ export class DateVerifier
   }
 
   rough_typeguard(data: any): data is Date {
-    return typeof data === 'string';
+    const t = typeof data;
+    if (t === 'string' || t === 'object') {
+      return true;
+    }
+    return false;
   }
 
   typeguard = this.properties.preciseTypeguard
@@ -375,10 +384,13 @@ export class ObjectNullVerifier
   }
 }
 export class ArrayVerifier<T = any>
-  extends DataVerifierBlueprint<{
-    valueVerifier: DataVerifierInterface<T>;
-    preciseTypeguard: boolean;
-  }>
+  extends DataVerifierBlueprint<
+    | {
+        valueVerifier: DataVerifierInterface<T>;
+        preciseTypeguard: boolean;
+      }
+    | undefined
+  >
   implements DataVerifierInterface<Array<T>>
 {
   precise_typeguard(data: any): data is Array<T> {
@@ -387,9 +399,9 @@ export class ArrayVerifier<T = any>
     }
     try {
       data = ArrayParser(data, '');
-      if (this.properties.valueVerifier) {
+      if (this.properties?.valueVerifier) {
         if (
-          data.filter((d: any) => !this.properties.valueVerifier?.typeguard(d))
+          data.filter((d: any) => !this.properties?.valueVerifier?.typeguard(d))
             .length !== 0
         ) {
           return false;
@@ -407,7 +419,7 @@ export class ArrayVerifier<T = any>
     return Array.isArray(data);
   }
 
-  typeguard = this.properties.preciseTypeguard
+  typeguard = this.properties?.preciseTypeguard
     ? this.precise_typeguard
     : this.rough_typeguard;
 
@@ -415,7 +427,7 @@ export class ArrayVerifier<T = any>
     data = ArrayParser(data, key);
     if (this.typeguard(data) && data) {
       if (
-        data.filter((d) => !this.properties.valueVerifier?.typeguard(d))
+        data.filter((d) => !this.properties?.valueVerifier?.typeguard(d))
           .length !== 0
       ) {
         throw ErrorDictionary.data.parameterInvalid(key);
@@ -431,16 +443,19 @@ export class ArrayVerifier<T = any>
     throw ErrorDictionary.data.parameterInvalid(key);
   }
 
-  transformer = this.properties.valueVerifier
+  transformer = this.properties?.valueVerifier
     ? this.arrayVerifyingTransformer
     : this.plainTransformer;
 }
 
 export class ArrayNullVerifier<T = any>
-  extends DataVerifierBlueprint<{
-    valueVerifier: DataVerifierInterface<T>;
-    preciseTypeguard: boolean;
-  }>
+  extends DataVerifierBlueprint<
+    | {
+        valueVerifier: DataVerifierInterface<T>;
+        preciseTypeguard: boolean;
+      }
+    | undefined
+  >
   implements DataVerifierInterface<Array<T> | nully>
 {
   precise_typeguard(data: any): data is Array<T> | nully {
@@ -449,9 +464,9 @@ export class ArrayNullVerifier<T = any>
     }
     try {
       data = ArrayParser(data, '');
-      if (this.properties.valueVerifier) {
+      if (this.properties?.valueVerifier) {
         if (
-          data.filter((d: any) => !this.properties.valueVerifier?.typeguard(d))
+          data.filter((d: any) => !this.properties?.valueVerifier?.typeguard(d))
             .length !== 0
         ) {
           return false;
@@ -469,7 +484,7 @@ export class ArrayNullVerifier<T = any>
     return Array.isArray(data) || isNully(data);
   }
 
-  typeguard = this.properties.preciseTypeguard
+  typeguard = this.properties?.preciseTypeguard
     ? this.precise_typeguard
     : this.rough_typeguard;
 
@@ -480,7 +495,7 @@ export class ArrayNullVerifier<T = any>
     data = ArrayParser(data, key);
     if (this.typeguard(data) && data) {
       if (
-        data.filter((d) => !this.properties.valueVerifier?.typeguard(d))
+        data.filter((d) => !this.properties?.valueVerifier?.typeguard(d))
           .length !== 0
       ) {
         throw ErrorDictionary.data.parameterInvalid(key);
@@ -498,7 +513,7 @@ export class ArrayNullVerifier<T = any>
     throw ErrorDictionary.data.parameterInvalid(key);
   }
 
-  transformer = this.properties.valueVerifier
+  transformer = this.properties?.valueVerifier
     ? this.arrayVerifyingTransformer
     : this.plainTransformer;
 }
@@ -593,6 +608,51 @@ export class AnyVerifier
   }
 }
 
+export class NullVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<null>
+{
+  typeguard(data: any): data is null {
+    return data === null;
+  }
+
+  transformer(data: any, key: string): null {
+    return null;
+  }
+}
+
+export class FunctionVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<Function>
+{
+  typeguard(data: any): data is Function {
+    return typeof data === 'function';
+  }
+
+  transformer(data: any, key: string): Function {
+    if (this.typeguard(data)) {
+      return data;
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
+export class FunctionNullVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<Function | nully>
+{
+  typeguard(data: any): data is Function | nully {
+    return typeof data === 'function' || isNully(data);
+  }
+
+  transformer(data: any, key: string): Function | nully {
+    if (this.typeguard(data)) {
+      return data;
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
 const __DataTypes = {
   string(...props: ConstructorParameters<typeof StringVerifier>) {
     return new StringVerifier(...props);
@@ -612,16 +672,16 @@ const __DataTypes = {
   objectNull(...props: ConstructorParameters<typeof ObjectNullVerifier>) {
     return new ObjectNullVerifier(...props);
   },
-  array<T>(
-    props: Partial<{
+  array<T = any>(
+    props?: Partial<{
       valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
     }>,
   ) {
     return new ArrayVerifier<T>(props);
   },
-  arrayNull<T>(
-    props: Partial<{
+  arrayNull<T = any>(
+    props?: Partial<{
       valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
     }>,
@@ -646,6 +706,37 @@ const __DataTypes = {
   any(...props: ConstructorParameters<typeof AnyVerifier>) {
     return new AnyVerifier(...props);
   },
+  null(...props: ConstructorParameters<typeof NullVerifier>) {
+    return new NullVerifier(...props);
+  },
+  function(...props: ConstructorParameters<typeof FunctionVerifier>) {
+    return new FunctionVerifier(...props);
+  },
+  functionNull(...props: ConstructorParameters<typeof FunctionNullVerifier>) {
+    return new FunctionNullVerifier(...props);
+  },
 };
+
+export function __preciseTypeof(data: any) {
+  const dataProp = {
+    undefined: { typeguard: (data: any) => data === undefined },
+    boolean: __DataTypes.boolean(),
+    function: __DataTypes.function(),
+    number: __DataTypes.number(),
+    array: __DataTypes.array(),
+    null: __DataTypes.null(),
+    date: __DataTypes.date({ preciseTypeguard: true }),
+    string: __DataTypes.string(),
+    object: __DataTypes.object(),
+    bigint: { typeguard: (data: any) => typeof data === 'bigint' },
+    symbol: { typeguard: (data: any) => typeof data === 'symbol' },
+  };
+
+  for (const [key, value] of Object.entries(dataProp)) {
+    if (value.typeguard(data)) {
+      return key;
+    }
+  }
+}
 
 export default __DataTypes;

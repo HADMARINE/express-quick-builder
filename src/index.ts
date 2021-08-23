@@ -1,4 +1,4 @@
-import _DataTypes from './util/DataVerify';
+import _DataTypes, { __preciseTypeof } from './util/DataVerify';
 import {
   WrappedRequest as _WrappedRequest,
   WrappedResponse as _WrappedResponse,
@@ -15,6 +15,7 @@ export type WrappedResponse = _WrappedResponse;
 
 // FUNCTIONS
 export const DataTypes = _DataTypes;
+export const preciseTypeof = __preciseTypeof;
 export const Wrapper = _Wrapper;
 export const RawWrapper = _RawWrapper;
 
