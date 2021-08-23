@@ -593,6 +593,51 @@ export class AnyVerifier
   }
 }
 
+export class NullVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<null>
+{
+  typeguard(data: any): data is null {
+    return data === null;
+  }
+
+  transformer(data: any, key: string): null {
+    return null;
+  }
+}
+
+export class FunctionVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<Function>
+{
+  typeguard(data: any): data is Function {
+    return typeof data === 'function';
+  }
+
+  transformer(data: any, key: string): Function {
+    if (this.typeguard(data)) {
+      return data;
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
+export class FunctionNullVerifier
+  extends DataVerifierBlueprint
+  implements DataVerifierInterface<Function | nully>
+{
+  typeguard(data: any): data is Function | nully {
+    return typeof data === 'function' || isNully(data);
+  }
+
+  transformer(data: any, key: string): Function | nully {
+    if (this.typeguard(data)) {
+      return data;
+    }
+    throw ErrorDictionary.data.parameterInvalid(key);
+  }
+}
+
 const __DataTypes = {
   string(...props: ConstructorParameters<typeof StringVerifier>) {
     return new StringVerifier(...props);
@@ -612,7 +657,7 @@ const __DataTypes = {
   objectNull(...props: ConstructorParameters<typeof ObjectNullVerifier>) {
     return new ObjectNullVerifier(...props);
   },
-  array<T>(
+  array<T = any>(
     props: Partial<{
       valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
@@ -620,7 +665,7 @@ const __DataTypes = {
   ) {
     return new ArrayVerifier<T>(props);
   },
-  arrayNull<T>(
+  arrayNull<T = any>(
     props: Partial<{
       valueVerifier: DataVerifierInterface<T>;
       preciseTypeGuard: boolean;
@@ -646,6 +691,36 @@ const __DataTypes = {
   any(...props: ConstructorParameters<typeof AnyVerifier>) {
     return new AnyVerifier(...props);
   },
+  null(...props: ConstructorParameters<typeof NullVerifier>) {
+    return new NullVerifier(...props);
+  },
+  function(...props: ConstructorParameters<typeof FunctionVerifier>) {
+    return new FunctionVerifier(...props);
+  },
+  functionNull(...props: ConstructorParameters<typeof FunctionNullVerifier>) {
+    return new FunctionNullVerifier(...props);
+  },
 };
+
+export function preciseTypeof(data: any) {
+  const res = typeof data;
+  const {
+    numberNull,
+    dateNull,
+    functionNull,
+    stringNull,
+    booleanNull,
+    objectNull,
+    arrayNull,
+    notNull,
+    ...dataProp
+  } = __DataTypes;
+
+  for (const [key, value] of Object.entries(dataProp)) {
+    if (value({ preciseTypeguard: true })(data)) {
+      return key;
+    }
+  }
+}
 
 export default __DataTypes;
