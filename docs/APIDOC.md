@@ -50,8 +50,6 @@ const returnValue = ServerStarter(parameters)
 
 ```
 
-port: <number> // The port that you want to make server to listen. OPTIONAL, Default is 4000
-portStrict: <boolean> //
 
 #### Parameters
 
