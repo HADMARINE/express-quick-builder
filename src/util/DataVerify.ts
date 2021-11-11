@@ -276,6 +276,9 @@ export class DateVerifier
 
   transformer(data: any, key: string): Date {
     try {
+      if (isNully(data)) {
+        throw undefined;
+      }
       return new Date(data);
     } catch {
       throw ErrorDictionary.data.parameterInvalid(key);

@@ -1,6 +1,6 @@
 {
   "name": "express-quick-builder",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "Express api quick builder & safe verifier",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
