@@ -165,7 +165,7 @@ export class StringNullVerifier
   implements DataVerifierInterface<string | nully>
 {
   typeguard(data: any): data is string | nully {
-    return typeof data === 'string' || isNully(data);
+    return typeof data === 'string' || isNully(data) || data === '';
   }
 
   transformer(data: any, key: string): string | nully {

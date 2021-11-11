@@ -1,6 +1,6 @@
 {
   "name": "express-quick-builder",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "Express api quick builder & safe verifier",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   "bugs": "https://github.com/hadmarine/express-quick-builder/issues",
   "homepage": "https://github.com/hadmarine/express-quick-builder",
   "author": "HADMARINE <contact@hadmarine.com>",
-  "license": "MIT",
+  "license": "Apache 2.0",
   "os": [
     "darwin",
     "linux",
