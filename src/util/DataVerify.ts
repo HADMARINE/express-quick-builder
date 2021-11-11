@@ -169,7 +169,7 @@ export class StringNullVerifier
   }
 
   transformer(data: any, key: string): string | nully {
-    if (isNully(data)) {
+    if (isNully(data) || data === '') {
       return null;
     }
     if (data) if (this.typeguard(data) && data) return data;
